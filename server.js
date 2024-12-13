@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const admin = require('firebase-admin');
 const axios = require('axios');
-const serviceAccount = require('./weather-forecast-92b1a-firebase-adminsdk-k7v5n-891ccfcead.json');
 
 const app = express();
 
@@ -12,15 +12,19 @@ app.use(cors());
 app.use(express.json()); 
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  }),
   });
 
   
 const transporter = nodemailer.createTransport({
     service: 'gmail', 
     auth: {
-      user: 'joey20092003@gmail.com', 
-      pass: 'hdeb isnd uozp kyur', 
+      user: process.env.GMAIL_USER, 
+      pass: process.env.GMAIL_PASS, 
     },
   });
 
@@ -89,4 +93,7 @@ cron.schedule('*/1 * * * *', async () => {
     console.log('Sending daily email...');
     await sendEmail(); 
     users = [];
+  });
+  app.listen(3000, () => {
+    console.log(`Server is running on http://localhost:${3000}`);
   });
