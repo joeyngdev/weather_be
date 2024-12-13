@@ -88,7 +88,7 @@ const transporter = nodemailer.createTransport({
         }
     }
 
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
     await listAllUsers();
     console.log('Sending daily email...');
     await sendEmail(); 
